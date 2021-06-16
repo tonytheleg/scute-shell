@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include "lib/get_input.h"
+#include <stdbool.h>
 
 void exec_cmd(char **cmd);
 
@@ -12,20 +13,37 @@ int main(void)
 {
     char **command;
     char *input;
-
-    char cmd_list[10][10];
+    char cmd_list[2][10] = {"scutecd", "scutels"};
+    int arrlen = sizeof(cmd_list) / sizeof(cmd_list[0]);
+    bool builtin;
 
     while (1) {
         // read what is passed to shell and parse it to separate
         // commands and args
         input = readline("scutesh> ");
         command = get_input(input);
-
-
-        exec_cmd(command);
-        free(input);
-        free(command);
+        printf("%s\n", command[0]);
+        
+        /* create an array of builtin commands
+        if command is in array, exec that command,
+        otherwise use system command
+        */
+        for (int i = 0; i < arrlen; i++) {
+            if (strcmp(command[0], cmd_list[i]) == 0) {
+                builtin = true;
+            }
+        }
+        if (builtin) {
+            exec_builtin(command);
+        } else {
+            exec_cmd(command);
+        }
     }
+}
+
+void exec_builtin(char **cmd) 
+{
+
 }
 
 void exec_cmd(char **cmd) {
